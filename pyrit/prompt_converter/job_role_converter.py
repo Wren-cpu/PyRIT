@@ -65,7 +65,7 @@ class JobRoleGenerator(PromptConverter):
         self._jobs = custom_jobs if custom_jobs else default_jobs
         
         # Create a regex pattern to match job roles
-        self._job_pattern = '|'.join(re.escape(title) for title in self._jobs)
+        self._job_pattern = r'\b(?:' + '|'.join(re.escape(title) + r's?' for title in self._jobs) + r')\b'
 
         self._deterministic = deterministic
 
@@ -93,6 +93,7 @@ class JobRoleGenerator(PromptConverter):
         new_prompt = prompt[:idx] + demographic + " " + prompt[idx:]
 
         # Fix the previous article (a/an) if needed
+        # Only works if the previous word is 'a' or 'an' with regular spacing
         words_before = prompt[:idx].split()
         if len(words_before) > 0:
             prev_word = words_before[-1]
